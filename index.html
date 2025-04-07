@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#0f172a" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Signika+Negative:wght@400;600&display=swap" rel="stylesheet">
+  <title>Pro Web App</title>
+  <style>
+    body {
+      font-family: 'Signika Negative', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center flex-col px-4">
+
+  <div class="text-center max-w-xl">
+    <h1 class="text-4xl font-semibold mb-4 text-yellow-400">Welcome to Pro WebApp</h1>
+    <p class="mb-6 text-gray-300">A fast, installable, and stylish Progressive Web App you can add to your phone like a real app.</p>
+    <button id="installBtn" class="hidden bg-yellow-500 hover:bg-yellow-600 text-black font-semibold py-3 px-6 rounded-lg shadow-md transition-all duration-300">
+      Install App
+    </button>
+  </div>
+
+  <script>
+    let deferredPrompt;
+    const installBtn = document.getElementById('installBtn');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      installBtn.classList.remove('hidden');
+
+      installBtn.addEventListener('click', () => {
+        installBtn.classList.add('hidden');
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choice => {
+          if (choice.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    window.addEventListener('appinstalled', () => {
+      console.log('App successfully installed');
+    });
+
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(() => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker registration failed:', err));
+    }
+  </script>
+</body>
+</html>
